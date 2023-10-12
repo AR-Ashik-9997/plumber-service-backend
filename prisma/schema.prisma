@@ -22,6 +22,8 @@ model User {
   Review    Review[]
   Feedback  Feedback[]
   Booking   Booking[]
+  Blog      Blog[]
+  Faq       Faq[]
 
   @@map("users")
 }
@@ -101,12 +103,49 @@ model Booking {
   service   Service  @relation(fields: [serviceId], references: [id])
   date      String
   time      String
-  status    Status?   @default(Pending)
+  status    Status?  @default(Pending)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Review    Review[]
 
   @@map("bookings")
+}
+
+model Blog {
+  id          String        @id @default(uuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  username    String
+  image       String
+  title       String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  BlogDetails BlogDetails[]
+
+  @@map("blogs")
+}
+
+model BlogDetails {
+  id        String   @id @default(uuid())
+  blogId    String
+  blog      Blog     @relation(fields: [blogId], references: [id])
+  banner    String?
+  details   Json[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blogDetails")
+}
+
+model Faq {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  list      Json[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("faqs")
 }
 
 enum Role {

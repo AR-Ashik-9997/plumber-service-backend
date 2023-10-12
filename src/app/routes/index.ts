@@ -5,6 +5,9 @@ import { UserRoutes } from '../modules/user/user.route';
 import { ServiceRoute } from '../modules/service/service.route';
 import { ReviewRoute } from '../modules/review/review.route';
 import { BookingRoute } from '../modules/booking/booking.route';
+import { FeedbackRoute } from '../modules/feedback/feedback.route';
+import { BlogRoute } from '../modules/blog/blog.route';
+import { FaqRoute } from '../modules/faq/faq.route';
 
 const router = express.Router();
 
@@ -32,6 +35,18 @@ const moduleRoutes = [
   {
     path: '/bookings',
     route: BookingRoute,
+  },
+  {
+    path: '/feedback',
+    route: FeedbackRoute,
+  },
+  {
+    path: '/blogs',
+    route: BlogRoute,
+  },
+  {
+    path: '/faq',
+    route: FaqRoute,
   },
 ];
 
