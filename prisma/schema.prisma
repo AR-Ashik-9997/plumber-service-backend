@@ -11,14 +11,17 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
+  id        String     @id @default(uuid())
   name      String
   email     String
   password  String
   role      Role?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   Profile   Profile[]
+  Review    Review[]
+  Feedback  Feedback[]
+  Booking   Booking[]
 
   @@map("users")
 }
@@ -38,7 +41,78 @@ model Profile {
   @@map("profiles")
 }
 
+model Service {
+  id             String    @id @default(uuid())
+  title          String
+  description    String
+  image          String
+  serviceDetails Json[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  Booking        Booking[]
+  Review         Review[]
+
+  @@map("services")
+}
+
+model ServiceCategory {
+  id          String   @id @default(uuid())
+  titles      String
+  description String
+  image       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("categories")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  serviceId String
+  service   Service  @relation(fields: [serviceId], references: [id])
+  review    String
+  rating    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("reviews")
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("feedbacks")
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  serviceId String
+  service   Service  @relation(fields: [serviceId], references: [id])
+  date      String
+  time      String
+  status    Status   @default(Pending)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("bookings")
+}
+
 enum Role {
   admin
   user
+}
+
+enum Status {
+  Pending
+  Accepted
+  Rejected
 }
