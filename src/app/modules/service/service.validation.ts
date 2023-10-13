@@ -11,6 +11,12 @@ const createServices = z.object({
     image: z.string({
       required_error: 'card image is required',
     }),
+    price: z.string({
+      required_error: 'price is required',
+    }),
+    category: z.string({
+      required_error: 'category name is required',
+    }),
     serviceDetails: z.array(
       z.object({
         banner: z.string({
