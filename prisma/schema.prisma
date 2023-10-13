@@ -11,19 +11,20 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  name      String
-  email     String
-  password  String
-  role      Role?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  Profile   Profile[]
-  Review    Review[]
-  Feedback  Feedback[]
-  Booking   Booking[]
-  Blog      Blog[]
-  Faq       Faq[]
+  id            String          @id @default(uuid())
+  name          String
+  email         String
+  password      String
+  role          Role?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  Profile       Profile[]
+  Feedback      Feedback[]
+  Booking       Booking[]
+  Blog          Blog[]
+  Faq           Faq[]
+  ProductReview ProductReview[]
+  ServiceReview ServiceReview[]
 
   @@map("users")
 }
@@ -44,15 +45,15 @@ model Profile {
 }
 
 model Service {
-  id             String    @id @default(uuid())
+  id             String          @id @default(uuid())
   title          String
   description    String
   image          String
   serviceDetails Json[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   Booking        Booking[]
-  Review         Review[]
+  ServiceReview  ServiceReview[]
 
   @@map("services")
 }
@@ -68,45 +69,18 @@ model ServiceCategory {
   @@map("categories")
 }
 
-model Review {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  serviceId String
-  service   Service  @relation(fields: [serviceId], references: [id])
-  bookingId String
-  booking   Booking  @relation(fields: [bookingId], references: [id])
-  review    String
-  rating    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("reviews")
-}
-
-model Feedback {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  comment   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("feedbacks")
-}
-
 model Booking {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  serviceId String
-  service   Service  @relation(fields: [serviceId], references: [id])
-  date      String
-  time      String
-  status    Status?  @default(Pending)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Review    Review[]
+  id            String          @id @default(uuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id])
+  serviceId     String
+  service       Service         @relation(fields: [serviceId], references: [id])
+  date          String
+  time          String
+  status        Status?         @default(Pending)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  ServiceReview ServiceReview[]
 
   @@map("bookings")
 }
@@ -135,6 +109,65 @@ model BlogDetails {
   updatedAt DateTime @updatedAt
 
   @@map("blogDetails")
+}
+
+model Product {
+  id            String          @id @default(uuid())
+  image         String
+  title         String
+  rating        String
+  price         String
+  description   String
+  features      Json[]
+  categoryName  String
+  quantity      String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  ProductReview ProductReview[]
+
+  @@map("products")
+}
+
+model ProductReview {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  userName  String
+  review    String
+  rating    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("productreviews")
+}
+
+model ServiceReview {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  serviceId String
+  service   Service  @relation(fields: [serviceId], references: [id])
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id])
+  review    String
+  rating    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("reviews")
+}
+
+model Feedback {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("feedbacks")
 }
 
 model Faq {

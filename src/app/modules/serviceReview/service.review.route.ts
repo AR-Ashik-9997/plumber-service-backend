@@ -3,8 +3,8 @@ import { ENUM_USER_ROLE } from '../../../enums/user';
 import auth from '../../middlewares/auth';
 
 import requestValidation from '../../middlewares/requestValidation';
-import { reviewValidation } from './review.validation';
-import { reviewController } from './review.controll';
+import { reviewValidation } from './service.review.validation';
+import { ServiceReviewController } from './service.review.controll';
 
 const router = express.Router();
 
@@ -12,17 +12,17 @@ router.post(
   '/',
   requestValidation(reviewValidation.createReview),
   auth(ENUM_USER_ROLE.USER),
-  reviewController.createReview
+  ServiceReviewController.createServiceReview
 );
 router.get(
   '/',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.USER),
-  reviewController.getAllReview
+  ServiceReviewController.getAllServiceReview
 );
 router.get(
   '/:id',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.USER),
-  reviewController.getSingleReview
+  ServiceReviewController.getSingleServiceReview
 );
 
-export const ReviewRoute = router;
+export const ServiceReviewRoute = router;

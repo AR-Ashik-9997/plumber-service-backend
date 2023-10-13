@@ -3,11 +3,13 @@ import { AuthRoute } from '../modules/auth/auth.route';
 import { ProfileRoute } from '../modules/profile/profile.route';
 import { UserRoutes } from '../modules/user/user.route';
 import { ServiceRoute } from '../modules/service/service.route';
-import { ReviewRoute } from '../modules/review/review.route';
+import { ServiceReviewRoute } from '../modules/serviceReview/service.review.route';
 import { BookingRoute } from '../modules/booking/booking.route';
 import { FeedbackRoute } from '../modules/feedback/feedback.route';
 import { BlogRoute } from '../modules/blog/blog.route';
 import { FaqRoute } from '../modules/faq/faq.route';
+import { ProductRoute } from '../modules/products/products.route';
+import { ProductReviewRoute } from '../modules/productReviews/product.review.route';
 
 const router = express.Router();
 
@@ -29,12 +31,20 @@ const moduleRoutes = [
     route: ServiceRoute,
   },
   {
-    path: '/reviews',
-    route: ReviewRoute,
+    path: '/service/reviews',
+    route: ServiceReviewRoute,
   },
   {
     path: '/bookings',
     route: BookingRoute,
+  },
+  {
+    path: '/products',
+    route: ProductRoute,
+  },
+  {
+    path: '/products/reviews',
+    route: ProductReviewRoute,
   },
   {
     path: '/feedback',
