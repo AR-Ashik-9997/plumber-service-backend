@@ -2,8 +2,21 @@ import { Profile } from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import prisma from '../../../shared/prisma';
+import { IUploadFile } from '../../../shared/files';
+import { FileUploadHelper } from '../../../helpers/fileUploader';
+import { JwtPayload } from 'jsonwebtoken';
 
-const createProfile = async (payload: Profile): Promise<Profile> => {
+const createProfile = async (
+  payload: Profile,
+  file: IUploadFile,
+  user: JwtPayload
+): Promise<Profile> => {
+  const image = await FileUploadHelper.uploadToCloudinary(file);
+  if (!image) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
+  }
+  payload.image = image?.secure_url;
+  payload.userId = user?.userId;
   const result = await prisma.profile.create({ data: payload });
   return result;
 };

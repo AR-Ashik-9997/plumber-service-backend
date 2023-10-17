@@ -4,10 +4,14 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { ProfileService } from './profile.service';
 import { Profile } from '@prisma/client';
+import { IUploadFile } from '../../../shared/files';
+import { JwtPayload } from 'jsonwebtoken';
 
 const createProfile = catchAsync(async (req: Request, res: Response) => {
   const { ...profileData } = req.body;
-  const result = await ProfileService.createProfile(profileData);
+  const user: JwtPayload = req.user!;
+  const file = req.file as IUploadFile;
+  const result = await ProfileService.createProfile(profileData, file, user);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -15,6 +19,7 @@ const createProfile = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const getSingleProfile = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   const result = await ProfileService.getSingleProfile(id);
