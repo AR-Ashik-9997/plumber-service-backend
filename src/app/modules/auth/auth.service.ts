@@ -23,6 +23,7 @@ const createUser = async (payload: User): Promise<Omit<User, 'password'>> => {
     payload.password,
     Number(config.bycrypt_salt_rounds)
   );
+  payload.role = 'user';
   const result = await prisma.user.create({
     data: payload,
   });

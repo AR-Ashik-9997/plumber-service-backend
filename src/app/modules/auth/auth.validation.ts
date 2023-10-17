@@ -1,5 +1,3 @@
-import { Role } from '@prisma/client';
-
 import { z } from 'zod';
 
 const createUser = z.object({
@@ -12,9 +10,6 @@ const createUser = z.object({
     }),
     password: z.string({
       required_error: 'password is required',
-    }),
-    role: z.enum([...Object.values(Role)] as [string, ...string[]], {
-      required_error: 'role is required',
     }),
   }),
 });
