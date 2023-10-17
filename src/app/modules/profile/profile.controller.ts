@@ -33,7 +33,8 @@ const getSingleProfile = catchAsync(async (req: Request, res: Response) => {
 const updateSingleProfile = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   const { ...updateData } = req.body;
-  const result = await ProfileService.updateSingleProfile(id, updateData);
+  const file = req?.file as IUploadFile;
+  const result = await ProfileService.updateSingleProfile(id, updateData, file);
   sendResponse<Profile>(res, {
     success: true,
     statusCode: httpStatus.OK,

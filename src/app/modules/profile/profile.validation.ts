@@ -15,12 +15,10 @@ const createProfile = z.object({
   }),
 });
 const updateProfile = z.object({
-  body: z.object({
-    username: z.string().optional(),
-    contactNo: z.string().optional(),
-    address: z.string().optional(),
-    bio: z.string().optional(),
-  }),
+  username: z.string().optional(),
+  contactNo: z.string().optional(),
+  address: z.string().optional(),
+  bio: z.string().optional(),
 });
 
 export const profileValidation = { createProfile, updateProfile };

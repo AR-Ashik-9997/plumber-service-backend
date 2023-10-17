@@ -37,7 +37,8 @@ const getSingleProfile = async (id: string): Promise<Profile | null> => {
 };
 const updateSingleProfile = async (
   id: string,
-  payload: Profile
+  payload: Profile,
+  file: IUploadFile
 ): Promise<Profile> => {
   const existingProfile = await prisma.profile.findFirst({
     where: { userId: id },
@@ -45,13 +46,28 @@ const updateSingleProfile = async (
   if (!existingProfile) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Profile not found');
   }
-  const result = await prisma.profile.update({
-    where: {
-      id: existingProfile.id,
-    },
-    data: payload,
-  });
-  return result;
+  if (file !== undefined) {
+    const image = await FileUploadHelper.uploadToCloudinary(file);
+    if (!image) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
+    }
+    payload.image = image?.secure_url;
+    const result = await prisma.profile.update({
+      where: {
+        id: existingProfile.id,
+      },
+      data: payload,
+    });
+    return result;
+  } else {
+    const result = await prisma.profile.update({
+      where: {
+        id: existingProfile.id,
+      },
+      data: payload,
+    });
+    return result;
+  }
 };
 
 export const ProfileService = {
