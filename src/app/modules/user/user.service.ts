@@ -7,6 +7,8 @@ import prisma from '../../../shared/prisma';
 import { UserWithoutPassword } from './user.interface';
 import { IUploadFile } from '../../../shared/files';
 import { FileUploadHelper } from '../../../helpers/fileUploader';
+import bcrypt from 'bcrypt';
+import config from '../../../config';
 
 const createUser = async (
   profile: Profile,
@@ -20,8 +22,12 @@ const createUser = async (
       },
     });
     if (user) {
-      throw new ApiError(httpStatus.NOT_FOUND, 'User already exists');
+      throw new ApiError(httpStatus.NOT_FOUND, 'User email already exists');
     }
+    payload.password = await bcrypt.hash(
+      payload.password,
+      Number(config.bycrypt_salt_rounds)
+    );
     payload.role = 'user';
     const newUser = await tx.user.create({ data: payload });
     if (!newUser) {
