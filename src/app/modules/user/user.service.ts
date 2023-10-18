@@ -50,7 +50,7 @@ const createUser = async (
 };
 
 const getAllUsers = async (): Promise<UserWithoutPassword[]> => {
-  const result = await prisma.user.findMany();
+  const result = await prisma.user.findMany({ where: { role: 'user' } });
   const usersWithoutPassword: UserWithoutPassword[] = result.map(user => {
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;

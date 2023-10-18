@@ -18,7 +18,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.getAllUsers();
-  sendResponse(res, {
+  sendResponse<UserWithoutPassword[]>(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: 'Users retrieved successfully',
@@ -28,7 +28,7 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await UserService.getSingleUser(id);
-  sendResponse(res, {
+  sendResponse<UserWithoutPassword>(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: 'User getched successfully',
