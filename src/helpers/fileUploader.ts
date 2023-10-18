@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 import * as fs from 'fs';
 import config from '../config';
 import { ICloudinaryResponse, IUploadFile } from '../shared/files';
+import { v4 } from 'uuid';
 
 cloudinary.config({
   cloud_name: config.cloudinary.cloudName as string,
@@ -12,10 +14,12 @@ cloudinary.config({
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './uploads/profile');
+    cb(null, 'uploads/profile');
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    const extname = file.originalname;
+    const uniqueFilename = v4() + '-' + extname;
+    cb(null, uniqueFilename);
   },
 });
 

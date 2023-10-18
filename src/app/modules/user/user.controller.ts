@@ -4,10 +4,12 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { UserService } from './user.service';
 import { UserWithoutPassword } from './user.interface';
+import { IUploadFile } from '../../../shared/files';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const { profile, ...userData } = req.body;
-  await UserService.createUser(profile, userData);
+  const file = req.file as IUploadFile;
+  await UserService.createUser(profile, userData, file);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -36,7 +38,13 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
 const updateSingleUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { profile, ...userData } = req.body;
-  const result = await UserService.updateSingleUser(id, profile, userData);
+  const file = req.file as IUploadFile;
+  const result = await UserService.updateSingleUser(
+    id,
+    profile,
+    userData,
+    file
+  );
   sendResponse<UserWithoutPassword>(res, {
     success: true,
     statusCode: httpStatus.OK,

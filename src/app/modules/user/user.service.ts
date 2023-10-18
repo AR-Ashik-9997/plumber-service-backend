@@ -5,8 +5,14 @@ import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import prisma from '../../../shared/prisma';
 import { UserWithoutPassword } from './user.interface';
+import { IUploadFile } from '../../../shared/files';
+import { FileUploadHelper } from '../../../helpers/fileUploader';
 
-const createUser = async (profile: Profile, payload: User): Promise<User> => {
+const createUser = async (
+  profile: Profile,
+  payload: User,
+  file: IUploadFile
+): Promise<User> => {
   const result = await prisma.$transaction(async tx => {
     const user = await prisma.user.findFirst({
       where: {
@@ -21,6 +27,11 @@ const createUser = async (profile: Profile, payload: User): Promise<User> => {
     if (!newUser) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'user creation failed');
     }
+    const image = await FileUploadHelper.uploadToCloudinary(file);
+    if (!image) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
+    }
+    profile.image = image.secure_url;
     profile.userId = newUser.id;
     profile.username = newUser.name;
     const newProfile = await tx.profile.create({ data: profile });
@@ -61,7 +72,8 @@ const getSingleUser = async (
 const updateSingleUser = async (
   id: string,
   profile: Partial<Profile>,
-  payload: Partial<User>
+  payload: Partial<User>,
+  file: IUploadFile
 ): Promise<UserWithoutPassword> => {
   const existingUser = await prisma.user.findFirst({
     where: {
@@ -80,13 +92,20 @@ const updateSingleUser = async (
     if (!newUser) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'user update failed');
     }
-    profile.username = newUser.name;
-    const newProfile = await tx.profile.updateMany({
-      where: { userId: newUser.id },
-      data: profile,
-    });
-    if (!newProfile) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'profile update failed');
+    if (file !== undefined) {
+      const image = await FileUploadHelper.uploadToCloudinary(file);
+      if (!image) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
+      }
+      profile.username = newUser.name;
+      profile.image = image?.secure_url;
+      const newProfile = await tx.profile.updateMany({
+        where: { userId: newUser.id },
+        data: profile,
+      });
+      if (!newProfile) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'profile update failed');
+      }
     }
     const { password, ...userWithoutPassword } = newUser;
     return userWithoutPassword;
