@@ -22,7 +22,20 @@ const storage = multer.diskStorage({
     cb(null, uniqueFilename);
   },
 });
+const Servicestorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/Service');
+  },
+  filename: function (req, file, cb) {
+    const extname = file.originalname;
+    const uniqueFilename = v4() + '-' + extname;
+    cb(null, uniqueFilename);
+  },
+});
 
+const Serviceupload = multer({
+  storage: Servicestorage,
+});
 const upload = multer({ storage: storage });
 
 const uploadToCloudinary = async (
@@ -46,4 +59,5 @@ const uploadToCloudinary = async (
 export const FileUploadHelper = {
   uploadToCloudinary,
   upload,
+  Serviceupload,
 };

@@ -1,18 +1,22 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { ENUM_USER_ROLE } from '../../../enums/user';
 import auth from '../../middlewares/auth';
-
-import requestValidation from '../../middlewares/requestValidation';
 import { serviceValidation } from './service.validation';
 import { serviceController } from './service.controller';
+import { FileUploadHelper } from '../../../helpers/fileUploader';
 
 const router = express.Router();
 
 router.post(
   '/',
-  requestValidation(serviceValidation.createServices),
   auth(ENUM_USER_ROLE.ADMIN),
-  serviceController.createService
+  FileUploadHelper.upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = serviceValidation.createServices.parse(
+      JSON.parse(req.body.data)
+    );
+    return serviceController.createService(req, res, next);
+  }
 );
 router.get(
   '/',
@@ -27,9 +31,14 @@ router.get(
 
 router.patch(
   '/:id',
-  requestValidation(serviceValidation.updateServices),
   auth(ENUM_USER_ROLE.ADMIN),
-  serviceController.updateSingleService
+  FileUploadHelper.upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = serviceValidation.updateServices.parse(
+      JSON.parse(req.body.data)
+    );
+    return serviceController.updateSingleService(req, res, next);
+  }
 );
 router.delete(
   '/:id',

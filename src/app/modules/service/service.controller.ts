@@ -7,10 +7,16 @@ import { Service } from '@prisma/client';
 import pick from '../../../shared/pick';
 import { paginationFields } from '../../../constants/pagination';
 import { ServiceFilterableFields } from './service.constant';
+import { IUploadFile } from '../../../shared/files';
 
 const createService = catchAsync(async (req: Request, res: Response) => {
-  const { ...serviceData } = req.body;
-  const result = await Services.createService(serviceData);
+  const { serviceDetails, ...serviceData } = req.body;
+  const file = req.file as IUploadFile;
+  const result = await Services.createService(
+    serviceDetails,
+    serviceData,
+    file
+  );
   sendResponse<Service>(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -42,8 +48,14 @@ const getSingleService = catchAsync(async (req: Request, res: Response) => {
 });
 const updateSingleService = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const { ...serviceData } = req.body;
-  const result = await Services.updateSingleService(id, serviceData);
+  const { serviceDetails, ...serviceData } = req.body;
+  const file = req.file as IUploadFile;
+  const result = await Services.updateSingleService(
+    id,
+    serviceData,
+    serviceDetails,
+    file
+  );
   sendResponse<Service>(res, {
     success: true,
     statusCode: httpStatus.OK,

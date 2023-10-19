@@ -40,11 +40,27 @@ CREATE TABLE "services" (
     "image" TEXT NOT NULL,
     "price" TEXT NOT NULL,
     "category" TEXT NOT NULL,
-    "serviceDetails" JSONB[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "services_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "servicesDetails" (
+    "id" TEXT NOT NULL,
+    "serviceId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "feature1" TEXT NOT NULL,
+    "feature2" TEXT NOT NULL,
+    "feature3" TEXT NOT NULL,
+    "feature4" TEXT NOT NULL,
+    "feature5" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "servicesDetails_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -167,6 +183,9 @@ CREATE TABLE "faqs" (
 
 -- AddForeignKey
 ALTER TABLE "profiles" ADD CONSTRAINT "profiles_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "servicesDetails" ADD CONSTRAINT "servicesDetails_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "services"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "bookings" ADD CONSTRAINT "bookings_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

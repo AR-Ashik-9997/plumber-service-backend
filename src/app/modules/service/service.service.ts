@@ -1,17 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Prisma, Service } from '@prisma/client';
+import { Prisma, Service, ServiceDetails } from '@prisma/client';
 import prisma from '../../../shared/prisma';
-import { IServiceSearchFilter, IServices } from './service.interface';
+import { IServiceSearchFilter } from './service.interface';
 import ApiError from '../../../errors/ApiError';
 import httpStatus from 'http-status';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import { IGenericResponse } from '../../../interfaces/common';
 import { ServiceSearchableFields } from './service.constant';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
+import { FileUploadHelper } from '../../../helpers/fileUploader';
+import { IUploadFile } from '../../../shared/files';
 
-const createService = async (payload: IServices): Promise<Service> => {
-  const result = await prisma.service.create({ data: payload });
-  return result;
+const createService = async (
+  serviceDetails: ServiceDetails,
+  serviceData: Service,
+  file: IUploadFile
+): Promise<Service> => {
+  const image = await FileUploadHelper.uploadToCloudinary(file);
+  if (!image) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
+  }
+  serviceData.image = image?.secure_url;
+  const newService = await prisma.service.create({ data: serviceData });
+  if (!newService) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Service creation failed');
+  }
+  serviceDetails.serviceId = newService.id;
+  await prisma.serviceDetails.create({
+    data: serviceDetails,
+  });
+  return newService;
 };
 const getAllServices = async (
   filters: IServiceSearchFilter,
@@ -61,7 +79,7 @@ const getAllServices = async (
     paginationHelpers.calculatePagination(paginationOptions);
   const result = await prisma.service.findMany({
     where: whereConditions,
-    include: { ServiceReview: true },
+    include: { ServiceReview: true, ServiceDetails: true },
     skip,
     take: size,
     orderBy:
@@ -95,21 +113,50 @@ const getSingleService = async (id: string): Promise<Service | null> => {
   }
   const result = await prisma.service.findUnique({
     where: { id: existingService.id },
+    include: { ServiceDetails: true },
   });
   return result;
 };
 const updateSingleService = async (
   id: string,
-  payload: Partial<IServices>
+  serviceData: Partial<Service>,
+  serviceDetails: Partial<ServiceDetails>,
+  file: IUploadFile
 ): Promise<Service> => {
   const existingService = await prisma.service.findFirst({ where: { id: id } });
   if (!existingService) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Service not found');
   }
-  const result = await prisma.service.update({
-    where: { id: existingService.id },
-    data: payload,
+
+  const result = await prisma.$transaction(async tx => {
+    if (file != undefined) {
+      const image = await FileUploadHelper.uploadToCloudinary(file);
+      if (!image) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
+      }
+      serviceData.image = image.secure_url;
+      const newService = await tx.service.update({
+        where: { id: existingService.id },
+        data: serviceData,
+        include: { ServiceDetails: true },
+      });
+      await tx.serviceDetails.updateMany({
+        where: { serviceId: newService.id },
+        data: serviceDetails,
+      });
+      return newService;
+    }
+    const newService = await tx.service.update({
+      where: { id: existingService.id },
+      data: serviceData,
+    });
+    await tx.serviceDetails.updateMany({
+      where: { serviceId: newService.id },
+      data: serviceDetails,
+    });
+    return newService;
   });
+
   return result;
 };
 const deleteService = async (id: string): Promise<Service> => {
