@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { ENUM_USER_ROLE } from '../../../enums/user';
 import auth from '../../middlewares/auth';
-import requestValidation from '../../middlewares/requestValidation';
 import { blogValidation } from './blog.validation';
 import { blogController } from './blog.controller';
 import { FileUploadHelper } from '../../../helpers/fileUploader';
@@ -21,7 +20,6 @@ router.get('/:id', blogController.getSingleBlog);
 
 router.patch(
   '/:id',
-  requestValidation(blogValidation.updateBlog),
   auth(ENUM_USER_ROLE.ADMIN),
   FileUploadHelper.upload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
