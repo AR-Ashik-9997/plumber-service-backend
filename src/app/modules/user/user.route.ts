@@ -15,11 +15,29 @@ router.post(
     return UserController.createUser(req, res, next);
   }
 );
-router.get('/', auth(ENUM_USER_ROLE.ADMIN), UserController.getAllUsers);
-router.get('/:id', auth(ENUM_USER_ROLE.ADMIN), UserController.getSingleUser);
+router.post(
+  '/create/admin',
+  auth(ENUM_USER_ROLE.SUPER_ADMIN),
+  FileUploadHelper.upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = UserValidation.createAdmin.parse(JSON.parse(req.body.data));
+    return UserController.createAdmin(req, res, next);
+  }
+);
+
+router.get(
+  '/',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  UserController.getAllUsers
+);
+router.get(
+  '/:id',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  UserController.getSingleUser
+);
 router.patch(
   '/:id',
-  auth(ENUM_USER_ROLE.ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   FileUploadHelper.upload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = UserValidation.updateUser.parse(JSON.parse(req.body.data));
@@ -28,7 +46,7 @@ router.patch(
 );
 router.delete(
   '/:id',
-  auth(ENUM_USER_ROLE.ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   UserController.deleteSingleUser
 );
 

@@ -1,24 +1,12 @@
+import { JwtPayload } from 'jsonwebtoken';
 import { Blog } from '@prisma/client';
 import prisma from '../../../shared/prisma';
 import ApiError from '../../../errors/ApiError';
 import httpStatus from 'http-status';
-import { IBlogDetails } from './blog.interface';
 
-const createBlog = async (
-  blogDetails: IBlogDetails,
-  blogData: Blog
-): Promise<Blog> => {
-  const result = await prisma.$transaction(async tx => {
-    const newBlog = await tx.blog.create({ data: blogData });
-    if (!newBlog) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'blog creation failed');
-    }
-    const newBlogDetails = await tx.blogDetails.create({ data: blogDetails });
-    if (!newBlogDetails) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'blogDetails creation failed');
-    }
-    return newBlog;
-  });
+const createBlog = async (payload: Blog, user: JwtPayload): Promise<Blog> => {
+  payload.userId = user?.userId;
+  const result = await prisma.blog.create({ data: payload });
   return result;
 };
 const getAllblog = async (): Promise<Blog[]> => {
@@ -37,39 +25,27 @@ const getSingleBlog = async (id: string): Promise<Blog | null> => {
 };
 const updateBlog = async (
   id: string,
-  blogDetails: Partial<IBlogDetails>,
-  blogData: Partial<Blog>
+  payload: Partial<Blog>
 ): Promise<Blog> => {
   const existingblog = await prisma.blog.findFirst({ where: { id: id } });
   if (!existingblog) {
     throw new ApiError(httpStatus.NOT_FOUND, 'blog not found');
   }
-  return await prisma.$transaction(async tx => {
-    await tx.blogDetails.updateMany({
-      where: { blogId: existingblog.id },
-      data: blogDetails,
-    });
-    const result = await tx.blog.update({
-      where: { id: existingblog.id },
-      data: blogData,
-    });
-    return result;
+  const result = await prisma.blog.update({
+    where: { id: existingblog.id },
+    data: payload,
   });
+  return result;
 };
 const deleteBlog = async (id: string): Promise<Blog> => {
   const existingblog = await prisma.blog.findFirst({ where: { id: id } });
   if (!existingblog) {
     throw new ApiError(httpStatus.NOT_FOUND, 'blog not found');
   }
-  return await prisma.$transaction(async tx => {
-    await tx.blogDetails.deleteMany({
-      where: { blogId: existingblog.id },
-    });
-    const result = await tx.blog.delete({
-      where: { id: existingblog.id },
-    });
-    return result;
+  const result = await prisma.blog.delete({
+    where: { id: existingblog.id },
   });
+  return result;
 };
 
 export const blogService = {

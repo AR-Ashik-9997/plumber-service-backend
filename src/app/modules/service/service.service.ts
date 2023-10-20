@@ -169,6 +169,9 @@ const deleteService = async (id: string): Promise<Service> => {
     await tx.serviceReview.deleteMany({
       where: { serviceId: existingService.id },
     });
+    await tx.serviceDetails.deleteMany({
+      where: { serviceId: existingService.id },
+    });
     const result = tx.service.delete({ where: { id: existingService.id } });
     return result;
   });

@@ -65,7 +65,7 @@ model ServiceDetails {
   serviceId   String
   service     Service  @relation(fields: [serviceId], references: [id])
   title       String
-  description String  
+  description String
   feature1    String
   feature2    String
   feature3    String
@@ -105,29 +105,17 @@ model Booking {
 }
 
 model Blog {
-  id          String        @id @default(uuid())
-  userId      String
-  user        User          @relation(fields: [userId], references: [id])
-  username    String
-  image       String
-  title       String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  BlogDetails BlogDetails[]
-
-  @@map("blogs")
-}
-
-model BlogDetails {
   id        String   @id @default(uuid())
-  blogId    String
-  blog      Blog     @relation(fields: [blogId], references: [id])
-  banner    String?
-  details   Json[]
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  username  String
+  image     String
+  title     String
+  blog      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("blogDetails")
+  @@map("blogs")
 }
 
 model Product {
@@ -203,6 +191,7 @@ model Faq {
 enum Role {
   admin
   user
+  super_admin
 }
 
 enum Status {

@@ -1,16 +1,20 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { ENUM_USER_ROLE } from '../../../enums/user';
 import auth from '../../middlewares/auth';
 import requestValidation from '../../middlewares/requestValidation';
 import { blogValidation } from './blog.validation';
 import { blogController } from './blog.controller';
+import { FileUploadHelper } from '../../../helpers/fileUploader';
 const router = express.Router();
 
 router.post(
   '/',
-  requestValidation(blogValidation.createBlog),
   auth(ENUM_USER_ROLE.ADMIN),
-  blogController.createBlog
+  FileUploadHelper.upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = blogValidation.createBlog.parse(JSON.parse(req.body.data));
+    return blogController.createBlog(req, res, next);
+  }
 );
 router.get('/', blogController.getAllblog);
 router.get('/:id', blogController.getSingleBlog);
@@ -19,7 +23,11 @@ router.patch(
   '/:id',
   requestValidation(blogValidation.updateBlog),
   auth(ENUM_USER_ROLE.ADMIN),
-  blogController.updateBlog
+  FileUploadHelper.upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = blogValidation.updateBlog.parse(JSON.parse(req.body.data));
+    return blogController.updateBlog(req, res, next);
+  }
 );
 router.delete('/:id', auth(ENUM_USER_ROLE.ADMIN), blogController.deleteBlog);
 

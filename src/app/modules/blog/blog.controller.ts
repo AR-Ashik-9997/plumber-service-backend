@@ -4,10 +4,12 @@ import sendResponse from '../../../shared/sendResponse';
 import httpStatus from 'http-status';
 import { Blog } from '@prisma/client';
 import { blogService } from './blog.service';
+import { JwtPayload } from 'jsonwebtoken';
 
 const createBlog = catchAsync(async (req: Request, res: Response) => {
-  const { blogDetails, ...blogData } = req.body;
-  const result = await blogService.createBlog(blogDetails, blogData);
+  const { ...blogData } = req.body;
+  const user: JwtPayload = req.user!;
+  const result = await blogService.createBlog(blogData, user);
   sendResponse<Blog>(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -36,8 +38,8 @@ const getSingleBlog = catchAsync(async (req: Request, res: Response) => {
 });
 const updateBlog = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const { blogDetails, ...blogData } = req.body;
-  const result = await blogService.updateBlog(id, blogDetails, blogData);
+  const { ...blogData } = req.body;
+  const result = await blogService.updateBlog(id, blogData);
   sendResponse<Blog>(res, {
     success: true,
     statusCode: httpStatus.OK,

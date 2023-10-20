@@ -5,6 +5,7 @@ import sendResponse from '../../../shared/sendResponse';
 import { UserService } from './user.service';
 import { UserWithoutPassword } from './user.interface';
 import { IUploadFile } from '../../../shared/files';
+import { JwtPayload } from 'jsonwebtoken';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const { profile, ...userData } = req.body;
@@ -16,8 +17,19 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
     message: 'Users created successfully',
   });
 });
+const createAdmin = catchAsync(async (req: Request, res: Response) => {
+  const { profile, ...userData } = req.body;
+  const file = req.file as IUploadFile;
+  await UserService.createAdmin(profile, userData, file);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Admin created successfully',
+  });
+});
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.getAllUsers();
+  const user: JwtPayload = req.user!;
+  const result = await UserService.getAllUsers(user);
   sendResponse<UserWithoutPassword[]>(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -69,4 +81,5 @@ export const UserController = {
   getSingleUser,
   updateSingleUser,
   deleteSingleUser,
+  createAdmin,
 };

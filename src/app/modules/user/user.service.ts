@@ -9,6 +9,7 @@ import { IUploadFile } from '../../../shared/files';
 import { FileUploadHelper } from '../../../helpers/fileUploader';
 import bcrypt from 'bcrypt';
 import config from '../../../config';
+import { JwtPayload } from 'jsonwebtoken';
 
 const createUser = async (
   profile: Profile,
@@ -48,9 +49,56 @@ const createUser = async (
   });
   return result;
 };
+const createAdmin = async (
+  profile: Profile,
+  payload: User,
+  file: IUploadFile
+): Promise<User> => {
+  const result = await prisma.$transaction(async tx => {
+    const user = await prisma.user.findFirst({
+      where: {
+        email: payload.email,
+      },
+    });
+    if (user) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'user email already exists');
+    }
+    payload.password = await bcrypt.hash(
+      payload.password,
+      Number(config.bycrypt_salt_rounds)
+    );
+    const newUser = await tx.user.create({ data: payload });
+    if (!newUser) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'admin creation failed');
+    }
+    const image = await FileUploadHelper.uploadToCloudinary(file);
+    if (!image) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
+    }
+    profile.image = image.secure_url;
+    profile.userId = newUser.id;
+    profile.username = newUser.name;
+    const newProfile = await tx.profile.create({ data: profile });
+    if (!newProfile) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'profile creation failed');
+    }
+    return newUser;
+  });
+  return result;
+};
 
-const getAllUsers = async (): Promise<UserWithoutPassword[]> => {
-  const result = await prisma.user.findMany({ where: { role: 'user' } });
+const getAllUsers = async (
+  user: JwtPayload
+): Promise<UserWithoutPassword[]> => {
+  if (user?.role === 'admin') {
+    const result = await prisma.user.findMany({ where: { role: 'user' } });
+    const usersWithoutPassword: UserWithoutPassword[] = result.map(user => {
+      const { password, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    });
+    return usersWithoutPassword;
+  }
+  const result = await prisma.user.findMany();
   const usersWithoutPassword: UserWithoutPassword[] = result.map(user => {
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
@@ -71,7 +119,6 @@ const getSingleUser = async (
     throw new ApiError(httpStatus.NOT_FOUND, 'user not found');
   }
   const { password, ...userWithoutPassword } = result;
-
   return userWithoutPassword;
 };
 
@@ -139,4 +186,5 @@ export const UserService = {
   updateSingleUser,
   deleteSingleUser,
   createUser,
+  createAdmin,
 };
