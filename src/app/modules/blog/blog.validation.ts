@@ -4,9 +4,6 @@ const createBlog = z.object({
   username: z.string({
     required_error: 'username is required',
   }),
-  image: z.string({
-    required_error: 'image is required',
-  }),
   title: z.string({
     required_error: 'title is required',
   }),
@@ -16,7 +13,6 @@ const createBlog = z.object({
 });
 const updateBlog = z.object({
   username: z.string().optional(),
-  image: z.string().optional(),
   title: z.string().optional(),
   blog: z.string().optional(),
 });
