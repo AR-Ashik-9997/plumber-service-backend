@@ -19,11 +19,13 @@ const getAllbooking = async (user: JwtPayload): Promise<Booking[]> => {
     }
     const result = await prisma.booking.findMany({
       where: { userId: userId },
-      include: { Review: true },
+      include: { ServiceReview: true },
     });
     return result;
   } else {
-    const result = await prisma.booking.findMany({ include: { Review: true } });
+    const result = await prisma.booking.findMany({
+      include: { ServiceReview: true },
+    });
     return result;
   }
 };
@@ -41,7 +43,7 @@ const getSingleBooking = async (
     }
     const result = await prisma.booking.findUnique({
       where: { id: existingBooking.id },
-      include: { Review: true },
+      include: { ServiceReview: true },
     });
     return result;
   } else {
@@ -53,7 +55,7 @@ const getSingleBooking = async (
     }
     const result = await prisma.booking.findUnique({
       where: { id: existingBooking.id },
-      include: { Review: true },
+      include: { ServiceReview: true },
     });
     return result;
   }
@@ -74,7 +76,7 @@ const updateBooking = async (
     const result = await prisma.booking.update({
       where: { id: existingBooking.id },
       data: { status: payload.status },
-      include: { Review: true },
+      include: { ServiceReview: true },
     });
     return result;
   } else {
@@ -87,7 +89,7 @@ const updateBooking = async (
     const result = await prisma.booking.update({
       where: { id: existingBooking.id },
       data: { status: payload.status },
-      include: { Review: true },
+      include: { ServiceReview: true },
     });
     return result;
   }
