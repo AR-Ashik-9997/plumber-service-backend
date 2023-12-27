@@ -11,6 +11,9 @@ const createUser = z.object({
   password: z.string({
     required_error: 'password is required',
   }),
+  role: z.enum([...Object.values(Role)] as [string, ...string[]], {
+    required_error: 'role is required',
+  }),
   profile: z.object({
     contactNo: z.string({
       required_error: 'contactNo is required',
@@ -23,6 +26,7 @@ const createUser = z.object({
     }),
   }),
 });
+
 const createAdmin = z.object({
   name: z.string({
     required_error: 'name is required',
@@ -48,7 +52,7 @@ const createAdmin = z.object({
     }),
   }),
 });
-const updateAllUser = z.object({
+const updateUser = z.object({
   name: z.string().optional(),
   email: z.string().optional(),
   role: z
@@ -60,19 +64,9 @@ const updateAllUser = z.object({
     bio: z.string().optional(),
   }),
 });
-const updateUser = z.object({
-  name: z.string().optional(),
-  email: z.string().optional(),
-  profile: z.object({
-    contactNo: z.string().optional(),
-    address: z.string().optional(),
-    bio: z.string().optional(),
-  }),
-});
 
 export const UserValidation = {
   createUser,
   updateUser,
   createAdmin,
-  updateAllUser,
 };

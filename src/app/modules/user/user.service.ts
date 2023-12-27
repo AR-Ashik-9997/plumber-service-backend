@@ -91,7 +91,9 @@ const getAllUsers = async (
   user: JwtPayload
 ): Promise<UserWithoutPassword[]> => {
   if (user?.role === 'admin') {
-    const result = await prisma.user.findMany({ where: { role: 'user' } });
+    const result = await prisma.user.findMany({
+      where: { OR: [{ role: 'user' }, { role: 'admin' }] },
+    });
     const usersWithoutPassword: UserWithoutPassword[] = result.map(user => {
       const { password, ...userWithoutPassword } = user;
       return userWithoutPassword;
