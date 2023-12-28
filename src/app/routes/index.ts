@@ -10,6 +10,7 @@ import { BlogRoute } from '../modules/blog/blog.route';
 import { FaqRoute } from '../modules/faq/faq.route';
 import { ProductRoute } from '../modules/products/products.route';
 import { ProductReviewRoute } from '../modules/productReviews/product.review.route';
+import { CommentRoute } from '../modules/comment/comment.route';
 
 const router = express.Router();
 
@@ -57,6 +58,10 @@ const moduleRoutes = [
   {
     path: '/faq',
     route: FaqRoute,
+  },
+  {
+    path: '/comment',
+    route: CommentRoute,
   },
 ];
 

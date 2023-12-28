@@ -10,13 +10,9 @@ import { ServiceFilterableFields } from './service.constant';
 import { IUploadFile } from '../../../shared/files';
 
 const createService = catchAsync(async (req: Request, res: Response) => {
-  const { serviceDetails, ...serviceData } = req.body;
+  const { ...serviceData } = req.body;
   const file = req.file as IUploadFile;
-  const result = await Services.createService(
-    serviceDetails,
-    serviceData,
-    file
-  );
+  const result = await Services.createService(serviceData, file);
   sendResponse<Service>(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -48,14 +44,9 @@ const getSingleService = catchAsync(async (req: Request, res: Response) => {
 });
 const updateSingleService = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const { serviceDetails, ...serviceData } = req.body;
+  const { ...serviceData } = req.body;
   const file = req.file as IUploadFile;
-  const result = await Services.updateSingleService(
-    id,
-    serviceData,
-    serviceDetails,
-    file
-  );
+  const result = await Services.updateSingleService(id, serviceData, file);
   sendResponse<Service>(res, {
     success: true,
     statusCode: httpStatus.OK,

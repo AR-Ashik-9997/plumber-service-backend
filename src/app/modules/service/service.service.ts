@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Prisma, Service, ServiceDetails } from '@prisma/client';
+
 import prisma from '../../../shared/prisma';
 import { IServiceSearchFilter } from './service.interface';
 import ApiError from '../../../errors/ApiError';
@@ -10,9 +10,9 @@ import { ServiceSearchableFields } from './service.constant';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { FileUploadHelper } from '../../../helpers/fileUploader';
 import { IUploadFile } from '../../../shared/files';
+import { Prisma, Service } from '@prisma/client';
 
 const createService = async (
-  serviceDetails: ServiceDetails,
   serviceData: Service,
   file: IUploadFile
 ): Promise<Service> => {
@@ -25,10 +25,6 @@ const createService = async (
   if (!newService) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Service creation failed');
   }
-  serviceDetails.serviceId = newService.id;
-  await prisma.serviceDetails.create({
-    data: serviceDetails,
-  });
   return newService;
 };
 const getAllServices = async (
@@ -79,7 +75,7 @@ const getAllServices = async (
     paginationHelpers.calculatePagination(paginationOptions);
   const result = await prisma.service.findMany({
     where: whereConditions,
-    include: { ServiceReview: true, ServiceDetails: true },
+    include: { ServiceReview: true },
     skip,
     take: size,
     orderBy:
@@ -113,14 +109,12 @@ const getSingleService = async (id: string): Promise<Service | null> => {
   }
   const result = await prisma.service.findUnique({
     where: { id: existingService.id },
-    include: { ServiceDetails: true },
   });
   return result;
 };
 const updateSingleService = async (
   id: string,
   serviceData: Partial<Service>,
-  serviceDetails: Partial<ServiceDetails>,
   file: IUploadFile
 ): Promise<Service> => {
   const existingService = await prisma.service.findFirst({ where: { id: id } });
@@ -138,21 +132,12 @@ const updateSingleService = async (
       const newService = await tx.service.update({
         where: { id: existingService.id },
         data: serviceData,
-        include: { ServiceDetails: true },
-      });
-      await tx.serviceDetails.updateMany({
-        where: { serviceId: newService.id },
-        data: serviceDetails,
       });
       return newService;
     }
     const newService = await tx.service.update({
       where: { id: existingService.id },
       data: serviceData,
-    });
-    await tx.serviceDetails.updateMany({
-      where: { serviceId: newService.id },
-      data: serviceDetails,
     });
     return newService;
   });
@@ -167,9 +152,6 @@ const deleteService = async (id: string): Promise<Service> => {
   return await prisma.$transaction(async tx => {
     await tx.booking.deleteMany({ where: { serviceId: existingService.id } });
     await tx.serviceReview.deleteMany({
-      where: { serviceId: existingService.id },
-    });
-    await tx.serviceDetails.deleteMany({
       where: { serviceId: existingService.id },
     });
     const result = tx.service.delete({ where: { id: existingService.id } });
