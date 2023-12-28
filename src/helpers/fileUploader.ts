@@ -14,17 +14,13 @@ cloudinary.config({
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/profile');
-  },
-  filename: function (req, file, cb) {
-    const extname = file.originalname;
-    const uniqueFilename = v4() + '-' + extname;
-    cb(null, uniqueFilename);
-  },
-});
-const Servicestorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/Service');
+    if (file.fieldname === 'profile') {
+      cb(null, 'uploads/profile');
+    } else if (file.fieldname === 'service') {
+      cb(null, 'uploads/service');
+    } else if (file.fieldname === 'blog') {
+      cb(null, 'uploads/blog');
+    }
   },
   filename: function (req, file, cb) {
     const extname = file.originalname;
@@ -33,9 +29,6 @@ const Servicestorage = multer.diskStorage({
   },
 });
 
-const Serviceupload = multer({
-  storage: Servicestorage,
-});
 const upload = multer({ storage: storage });
 
 const uploadToCloudinary = async (
@@ -59,5 +52,4 @@ const uploadToCloudinary = async (
 export const FileUploadHelper = {
   uploadToCloudinary,
   upload,
-  Serviceupload,
 };

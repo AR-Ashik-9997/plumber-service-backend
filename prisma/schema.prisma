@@ -22,7 +22,6 @@ model User {
   Feedback      Feedback[]
   Booking       Booking[]
   Blog          Blog[]
-  Faq           Faq[]
   ProductReview ProductReview[]
   ServiceReview ServiceReview[]
   Comment       Comment[]
@@ -167,8 +166,6 @@ model Feedback {
 
 model Faq {
   id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
   list      Json[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

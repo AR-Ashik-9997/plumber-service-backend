@@ -3,6 +3,5 @@ type IList = {
   descrption: string;
 };
 export type IFaq = {
-  userId: string;
   list: IList[];
 };

@@ -8,7 +8,7 @@ const router = express.Router();
 router.post(
   '/',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
-  FileUploadHelper.upload.single('file'),
+  FileUploadHelper.upload.single('profile'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = profileValidation.createProfile.parse(JSON.parse(req.body.data));
     return ProfileController.createProfile(req, res, next);
@@ -24,7 +24,7 @@ router.get(
 router.patch(
   '/:id',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
-  FileUploadHelper.upload.single('file'),
+  FileUploadHelper.upload.single('profile'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = profileValidation.updateProfile.parse(JSON.parse(req.body.data));
     return ProfileController.updateSingleProfile(req, res, next);

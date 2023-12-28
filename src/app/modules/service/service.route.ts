@@ -9,7 +9,7 @@ const router = express.Router();
 router.post(
   '/',
   auth(ENUM_USER_ROLE.ADMIN),
-  FileUploadHelper.upload.single('file'),
+  FileUploadHelper.upload.single('service'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = serviceValidation.createServices.parse(
       JSON.parse(req.body.data)
@@ -31,7 +31,7 @@ router.get(
 router.patch(
   '/:id',
   auth(ENUM_USER_ROLE.ADMIN),
-  FileUploadHelper.upload.single('file'),
+  FileUploadHelper.upload.single('service'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = serviceValidation.updateServices.parse(
       JSON.parse(req.body.data)
