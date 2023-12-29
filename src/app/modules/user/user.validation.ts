@@ -65,8 +65,19 @@ const updateUser = z.object({
   }),
 });
 
+const changePassword = z.object({
+  body: z.object({
+    oldpassword: z.string({
+      required_error: 'oldpassword is required',
+    }),
+    newpassword: z.string({
+      required_error: 'newpassword is required',
+    }),
+  }),
+});
 export const UserValidation = {
   createUser,
   updateUser,
   createAdmin,
+  changePassword,
 };

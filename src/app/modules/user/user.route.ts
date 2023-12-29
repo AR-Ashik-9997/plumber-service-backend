@@ -4,6 +4,7 @@ import auth from '../../middlewares/auth';
 import { UserController } from './user.controller';
 import { UserValidation } from './user.validation';
 import { FileUploadHelper } from '../../../helpers/fileUploader';
+import requestValidation from '../../middlewares/requestValidation';
 const router = express.Router();
 router.post(
   '/',
@@ -22,6 +23,12 @@ router.post(
     req.body = UserValidation.createAdmin.parse(JSON.parse(req.body.data));
     return UserController.createAdmin(req, res, next);
   }
+);
+router.post(
+  '/changepassword',
+  requestValidation(UserValidation.changePassword),
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
+  UserController.changePassword
 );
 
 router.get(
@@ -43,6 +50,7 @@ router.patch(
     return UserController.updateSingleUser(req, res, next);
   }
 );
+
 router.delete(
   '/:id',
   auth(ENUM_USER_ROLE.SUPER_ADMIN),

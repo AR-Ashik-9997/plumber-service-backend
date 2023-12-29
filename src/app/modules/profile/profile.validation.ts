@@ -21,4 +21,7 @@ const updateProfile = z.object({
   bio: z.string().optional(),
 });
 
-export const profileValidation = { createProfile, updateProfile };
+export const profileValidation = {
+  createProfile,
+  updateProfile,
+};

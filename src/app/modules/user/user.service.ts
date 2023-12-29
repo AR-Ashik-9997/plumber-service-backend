@@ -4,7 +4,7 @@ import { Profile, User } from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import prisma from '../../../shared/prisma';
-import { UserWithoutPassword } from './user.interface';
+import { IChangePassword, UserWithoutPassword } from './user.interface';
 import { IUploadFile } from '../../../shared/files';
 import { FileUploadHelper } from '../../../helpers/fileUploader';
 import bcrypt from 'bcrypt';
@@ -182,6 +182,29 @@ const deleteSingleUser = async (id: string): Promise<User> => {
   });
 };
 
+const changePassword = async (payload: IChangePassword, user: JwtPayload) => {
+  const { userId } = user;
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+  if (!existingUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'user not found');
+  }
+  if (!(await bcrypt.compare(payload.oldpassword, existingUser.password))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Old password is incorrect');
+  }
+  payload.newpassword = await bcrypt.hash(
+    payload.newpassword,
+    Number(config.bycrypt_salt_rounds)
+  );
+  const result = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      password: payload.newpassword,
+    },
+  });
+  return result;
+};
 export const UserService = {
   getAllUsers,
   getSingleUser,
@@ -189,4 +212,5 @@ export const UserService = {
   deleteSingleUser,
   createUser,
   createAdmin,
+  changePassword,
 };

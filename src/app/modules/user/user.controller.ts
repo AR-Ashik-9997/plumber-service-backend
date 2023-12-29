@@ -64,6 +64,19 @@ const updateSingleUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const changePassword = catchAsync(async (req: Request, res: Response) => {
+  const { ...passwordData } = req.body;
+  const user = req.user!;
+
+  const result = await UserService.changePassword(passwordData, user);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Password Change successfully',
+    data: result,
+  });
+});
+
 const deleteSingleUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await UserService.deleteSingleUser(id);
@@ -82,4 +95,5 @@ export const UserController = {
   updateSingleUser,
   deleteSingleUser,
   createAdmin,
+  changePassword,
 };
