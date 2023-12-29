@@ -5,6 +5,17 @@ import httpStatus from 'http-status';
 import { Faq } from '@prisma/client';
 import { faqService } from './faq.service';
 
+const create = catchAsync(async (req: Request, res: Response) => {
+  const data = req.body;
+
+  const result = await faqService.create(data);
+  sendResponse<Faq>(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Frequently Ask Question retrived successfully',
+    data: result,
+  });
+});
 const getFaq = catchAsync(async (req: Request, res: Response) => {
   const result = await faqService.getFaq();
   sendResponse<Faq[]>(res, {
@@ -29,4 +40,5 @@ const updateFaq = catchAsync(async (req: Request, res: Response) => {
 export const faqController = {
   getFaq,
   updateFaq,
+  create,
 };

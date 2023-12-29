@@ -6,6 +6,7 @@ import { faqValidation } from './faq.validation';
 import { faqController } from './faq.controller';
 const router = express.Router();
 
+router.post('/create', faqController.create);
 router.get('/', faqController.getFaq);
 
 router.patch(
