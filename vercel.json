@@ -8,8 +8,8 @@
   ],
   "routes": [
     {
-      "src": "/uploads/(.*)", // Change this to the actual path of your uploads
-      "dest": "/uploads/$1" // Change this to the actual path of your uploads
+      "src": "/uploads/(.*)",
+      "dest": "/uploads/$1" 
     },
     {
       "src": "/(.*)",
