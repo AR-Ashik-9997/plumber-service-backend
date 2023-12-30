@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import prisma from '../../../shared/prisma';
-import { IServiceSearchFilter } from './service.interface';
+import { IServiceSearchFilter, IServices } from './service.interface';
 import ApiError from '../../../errors/ApiError';
 import httpStatus from 'http-status';
 import { IPaginationOptions } from '../../../interfaces/pagination';
@@ -13,15 +13,15 @@ import { IUploadFile } from '../../../shared/files';
 import { Prisma, Service } from '@prisma/client';
 
 const createService = async (
-  serviceData: Service,
+  payload: IServices,
   file: IUploadFile
 ): Promise<Service> => {
   const image = await FileUploadHelper.uploadToCloudinary(file);
   if (!image) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
   }
-  serviceData.image = image?.secure_url;
-  const newService = await prisma.service.create({ data: serviceData });
+  payload.image = image?.secure_url;
+  const newService = await prisma.service.create({ data: payload });
   if (!newService) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Service creation failed');
   }
@@ -114,7 +114,7 @@ const getSingleService = async (id: string): Promise<Service | null> => {
 };
 const updateSingleService = async (
   id: string,
-  serviceData: Partial<Service>,
+  serviceData: Partial<IServices>,
   file: IUploadFile
 ): Promise<Service> => {
   const existingService = await prisma.service.findFirst({ where: { id: id } });

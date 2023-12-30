@@ -45,21 +45,18 @@ model Profile {
 }
 
 model Service {
-  id            String          @id @default(uuid())
-  title         String
-  description   String
-  image         String
-  price         String
-  category      String
-  feature1      String
-  feature2      String
-  feature3      String
-  feature4      String
+  id           String       @id @default(uuid())
+  title        String
+  description  String
+  availability Availablity? @default(Available)
+  image        String
+  price        String
+  category     String
+  features     Json[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   Booking       Booking[]
   ServiceReview ServiceReview[]
-
   @@map("services")
 }
 
@@ -194,4 +191,9 @@ enum Status {
   Pending
   Accepted
   Rejected
+}
+
+enum Availablity {
+  Available
+  NotAvailable
 }

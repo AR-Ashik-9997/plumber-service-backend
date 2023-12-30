@@ -3,7 +3,6 @@ import prisma from '../../../shared/prisma';
 import { IFaq } from './faq.interface';
 
 const create = async (payload: IFaq): Promise<Faq> => {
-  console.log(payload);
   const result = await prisma.faq.create({ data: payload });
   return result;
 };

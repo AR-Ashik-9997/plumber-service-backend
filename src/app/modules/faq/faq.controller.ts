@@ -6,9 +6,8 @@ import { Faq } from '@prisma/client';
 import { faqService } from './faq.service';
 
 const create = catchAsync(async (req: Request, res: Response) => {
-  const data = req.body;
-
-  const result = await faqService.create(data);
+  const { ...faqData } = req.body;
+  const result = await faqService.create(faqData);
   sendResponse<Faq>(res, {
     success: true,
     statusCode: httpStatus.OK,
