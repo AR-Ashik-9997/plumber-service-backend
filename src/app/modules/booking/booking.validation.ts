@@ -19,9 +19,11 @@ const createBooking = z.object({
 });
 const updateBooking = z.object({
   body: z.object({
-    status: z.enum([...Object.values(Status)] as [string, ...string[]], {
-      required_error: 'status is required',
-    }),
+    date: z.string().optional(),
+    time: z.string().optional(),
+    status: z
+      .enum([...Object.values(Status)] as [string, ...string[]])
+      .optional(),
   }),
 });
 
