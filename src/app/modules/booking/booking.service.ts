@@ -19,7 +19,15 @@ const getAllbooking = async (user: JwtPayload): Promise<Booking[]> => {
     }
     const result = await prisma.booking.findMany({
       where: { userId: userId },
-      include: { ServiceReview: true },
+      include: {
+        service: {
+          select: {
+            title: true,
+            image: true,
+          },
+        },
+        ServiceReview: true,
+      },
     });
     return result;
   } else {
@@ -55,7 +63,15 @@ const getSingleBooking = async (
     }
     const result = await prisma.booking.findUnique({
       where: { id: existingBooking.id },
-      include: { ServiceReview: true },
+      include: {
+        service: {
+          select: {
+            title: true,
+            image: true,
+          },
+        },
+        ServiceReview: true,
+      },
     });
     return result;
   } else {
@@ -117,9 +133,31 @@ const updateBooking = async (
   }
 };
 
+const deleteBooking = async (
+  id: string,
+  user: JwtPayload
+): Promise<Booking> => {
+  const { role, userId } = user;
+  if (role === 'user') {
+    const existingBooking = await prisma.booking.findFirst({
+      where: { userId: userId, id: id },
+    });
+    if (!existingBooking) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'Booking service not found');
+    }
+    const result = await prisma.booking.delete({
+      where: { id: existingBooking.id },
+    });
+    return result;
+  } else {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not Authorized');
+  }
+};
+
 export const bookingService = {
   createBooking,
   getAllbooking,
   getSingleBooking,
   updateBooking,
+  deleteBooking,
 };

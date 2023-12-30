@@ -49,10 +49,22 @@ const updateBooking = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const deleteBooking = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const user: JwtPayload = req.user!;
+  const result = await bookingService.deleteBooking(id, user);
+  sendResponse<Booking>(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Booking deleted successfully',
+    data: result,
+  });
+});
 
 export const bookingController = {
   createBooking,
   getAllbooking,
   getSingleBooking,
   updateBooking,
+  deleteBooking,
 };
