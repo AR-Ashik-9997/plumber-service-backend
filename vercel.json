@@ -6,11 +6,7 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
-    {
-      "src": "/uploads/(.*)",
-      "dest": "/uploads/$1"
-    },
+  "routes": [    
     {
       "src": "/(.*)",
       "dest": "dist/server.js"
