@@ -45,18 +45,19 @@ model Profile {
 }
 
 model Service {
-  id           String       @id @default(uuid())
-  title        String
-  description  String
-  availability Availablity? @default(Available)
-  image        String
-  price        String
-  category     String
-  features     Json[]
+  id            String          @id @default(uuid())
+  title         String
+  description   String
+  availability  Availablity?
+  image         String
+  price         Int
+  category      String
+  features      Json[]
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   Booking       Booking[]
   ServiceReview ServiceReview[]
+
   @@map("services")
 }
 

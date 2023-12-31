@@ -1,18 +1,15 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import { ENUM_USER_ROLE } from '../../../enums/user';
 import auth from '../../middlewares/auth';
 import { ProfileController } from './profile.controller';
 import { profileValidation } from './profile.validation';
-import { FileUploadHelper } from '../../../helpers/fileUploader';
+import requestValidation from '../../middlewares/requestValidation';
 const router = express.Router();
 router.post(
   '/',
+  requestValidation(profileValidation.createProfile),
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
-  FileUploadHelper.upload.single('profile'),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = profileValidation.createProfile.parse(JSON.parse(req.body.data));
-    return ProfileController.createProfile(req, res, next);
-  }
+  ProfileController.createProfile
 );
 
 router.get(
@@ -23,12 +20,9 @@ router.get(
 
 router.patch(
   '/:id',
+  requestValidation(profileValidation.updateProfile),
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
-  FileUploadHelper.upload.single('profile'),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = profileValidation.updateProfile.parse(JSON.parse(req.body.data));
-    return ProfileController.updateSingleProfile(req, res, next);
-  }
+  ProfileController.updateSingleProfile
 );
 
 export const ProfileRoute = router;

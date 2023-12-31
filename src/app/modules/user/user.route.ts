@@ -1,28 +1,22 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import { ENUM_USER_ROLE } from '../../../enums/user';
 import auth from '../../middlewares/auth';
 import { UserController } from './user.controller';
 import { UserValidation } from './user.validation';
-import { FileUploadHelper } from '../../../helpers/fileUploader';
+
 import requestValidation from '../../middlewares/requestValidation';
 const router = express.Router();
 router.post(
   '/',
+  requestValidation(UserValidation.createUser),
   auth(ENUM_USER_ROLE.ADMIN),
-  FileUploadHelper.upload.single('file'),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = UserValidation.createUser.parse(JSON.parse(req.body.data));
-    return UserController.createUser(req, res, next);
-  }
+  UserController.createUser
 );
 router.post(
   '/create/admin',
+  requestValidation(UserValidation.createAdmin),
   auth(ENUM_USER_ROLE.SUPER_ADMIN),
-  FileUploadHelper.upload.single('file'),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = UserValidation.createAdmin.parse(JSON.parse(req.body.data));
-    return UserController.createAdmin(req, res, next);
-  }
+  UserController.createAdmin
 );
 router.post(
   '/changepassword',
@@ -43,12 +37,9 @@ router.get(
 );
 router.patch(
   '/:id',
+  requestValidation(UserValidation.updateUser),
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  FileUploadHelper.upload.single('file'),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = UserValidation.updateUser.parse(JSON.parse(req.body.data));
-    return UserController.updateSingleUser(req, res, next);
-  }
+  UserController.updateSingleUser
 );
 
 router.delete(

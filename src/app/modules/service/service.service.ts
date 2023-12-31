@@ -8,19 +8,9 @@ import { IPaginationOptions } from '../../../interfaces/pagination';
 import { IGenericResponse } from '../../../interfaces/common';
 import { ServiceSearchableFields } from './service.constant';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
-import { FileUploadHelper } from '../../../helpers/fileUploader';
-import { IUploadFile } from '../../../shared/files';
 import { Prisma, Service } from '@prisma/client';
 
-const createService = async (
-  payload: IServices,
-  file: IUploadFile
-): Promise<Service> => {
-  const image = await FileUploadHelper.uploadToCloudinary(file);
-  if (!image) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
-  }
-  payload.image = image?.secure_url;
+const createService = async (payload: IServices): Promise<Service> => {
   const newService = await prisma.service.create({ data: payload });
   if (!newService) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Service creation failed');
@@ -114,21 +104,14 @@ const getSingleService = async (id: string): Promise<Service | null> => {
 };
 const updateSingleService = async (
   id: string,
-  serviceData: Partial<IServices>,
-  file: IUploadFile
+  serviceData: Partial<IServices>
 ): Promise<Service> => {
   const existingService = await prisma.service.findFirst({ where: { id: id } });
   if (!existingService) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Service not found');
   }
-
   const result = await prisma.$transaction(async tx => {
-    if (file != undefined) {
-      const image = await FileUploadHelper.uploadToCloudinary(file);
-      if (!image) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
-      }
-      serviceData.image = image.secure_url;
+    if (serviceData.image != undefined) {
       const newService = await tx.service.update({
         where: { id: existingService.id },
         data: serviceData,

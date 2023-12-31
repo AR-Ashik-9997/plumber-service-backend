@@ -5,17 +5,11 @@ import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import prisma from '../../../shared/prisma';
 import { IChangePassword, UserWithoutPassword } from './user.interface';
-import { IUploadFile } from '../../../shared/files';
-import { FileUploadHelper } from '../../../helpers/fileUploader';
 import bcrypt from 'bcrypt';
 import config from '../../../config';
 import { JwtPayload } from 'jsonwebtoken';
 
-const createUser = async (
-  profile: Profile,
-  payload: User,
-  file: IUploadFile
-): Promise<User> => {
+const createUser = async (profile: Profile, payload: User): Promise<User> => {
   const result = await prisma.$transaction(async tx => {
     const user = await prisma.user.findFirst({
       where: {
@@ -34,11 +28,6 @@ const createUser = async (
     if (!newUser) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'user creation failed');
     }
-    const image = await FileUploadHelper.uploadToCloudinary(file);
-    if (!image) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
-    }
-    profile.image = image.secure_url;
     profile.userId = newUser.id;
     profile.username = newUser.name;
     const newProfile = await tx.profile.create({ data: profile });
@@ -49,11 +38,7 @@ const createUser = async (
   });
   return result;
 };
-const createAdmin = async (
-  profile: Profile,
-  payload: User,
-  file: IUploadFile
-): Promise<User> => {
+const createAdmin = async (profile: Profile, payload: User): Promise<User> => {
   const result = await prisma.$transaction(async tx => {
     const user = await prisma.user.findFirst({
       where: {
@@ -71,11 +56,6 @@ const createAdmin = async (
     if (!newUser) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'admin creation failed');
     }
-    const image = await FileUploadHelper.uploadToCloudinary(file);
-    if (!image) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
-    }
-    profile.image = image.secure_url;
     profile.userId = newUser.id;
     profile.username = newUser.name;
     const newProfile = await tx.profile.create({ data: profile });
@@ -127,8 +107,7 @@ const getSingleUser = async (
 const updateSingleUser = async (
   id: string,
   profile: Partial<Profile>,
-  payload: Partial<User>,
-  file: IUploadFile
+  payload: Partial<User>
 ): Promise<UserWithoutPassword> => {
   const existingUser = await prisma.user.findFirst({
     where: {
@@ -147,13 +126,8 @@ const updateSingleUser = async (
     if (!newUser) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'user update failed');
     }
-    if (file !== undefined) {
-      const image = await FileUploadHelper.uploadToCloudinary(file);
-      if (!image) {
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid profile');
-      }
+    if (profile.image !== undefined) {
       profile.username = newUser.name;
-      profile.image = image?.secure_url;
       const newProfile = await tx.profile.updateMany({
         where: { userId: newUser.id },
         data: profile,

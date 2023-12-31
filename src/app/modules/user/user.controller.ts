@@ -4,13 +4,11 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { UserService } from './user.service';
 import { UserWithoutPassword } from './user.interface';
-import { IUploadFile } from '../../../shared/files';
 import { JwtPayload } from 'jsonwebtoken';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const { profile, ...userData } = req.body;
-  const file = req.file as IUploadFile;
-  await UserService.createUser(profile, userData, file);
+  await UserService.createUser(profile, userData);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -19,8 +17,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 });
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
   const { profile, ...userData } = req.body;
-  const file = req.file as IUploadFile;
-  await UserService.createAdmin(profile, userData, file);
+  await UserService.createAdmin(profile, userData);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -50,13 +47,7 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
 const updateSingleUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { profile, ...userData } = req.body;
-  const file = req.file as IUploadFile;
-  const result = await UserService.updateSingleUser(
-    id,
-    profile,
-    userData,
-    file
-  );
+  const result = await UserService.updateSingleUser(id, profile, userData);
   sendResponse<UserWithoutPassword>(res, {
     success: true,
     statusCode: httpStatus.OK,

@@ -16,7 +16,8 @@ export type IServices = {
   title: string;
   description: string;
   image: string;
-  price: string;
+  price: number;
   category: string;
+  availability: 'Available' | 'NotAvailable';
   features: IFeatures[];
 };
