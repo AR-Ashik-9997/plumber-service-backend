@@ -11,7 +11,7 @@ const create = catchAsync(async (req: Request, res: Response) => {
   sendResponse<Faq>(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Frequently Ask Question retrived successfully',
+    message: 'Frequently Ask Question Created successfully',
     data: result,
   });
 });
