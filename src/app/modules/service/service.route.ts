@@ -12,16 +12,8 @@ router.post(
   auth(ENUM_USER_ROLE.ADMIN),
   serviceController.createService
 );
-router.get(
-  '/',
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
-  serviceController.getAllServices
-);
-router.get(
-  '/:id',
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.USER),
-  serviceController.getSingleService
-);
+router.get('/', serviceController.getAllServices);
+router.get('/:id', serviceController.getSingleService);
 
 router.patch(
   '/:id',
